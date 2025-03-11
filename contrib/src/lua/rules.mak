@@ -23,6 +23,9 @@ endif
 ifdef HAVE_SOLARIS
 LUA_TARGET := solaris
 endif
+ifdef HAVE_QNX
+LUA_TARGET := posix
+endif
 
 # Feel free to add autodetection if you need to...
 PKGS += lua luac
