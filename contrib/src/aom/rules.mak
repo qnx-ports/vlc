@@ -18,6 +18,9 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
 	$(APPLY) $(SRC)/aom/aom-android-cpufeatures.patch
 endif
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/aom/aom-qnx-pthreads.patch
+endif
 	$(MOVE)
 ifdef HAVE_ANDROID
 	cp $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.c $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.h aom/aom_ports/
@@ -80,6 +83,11 @@ endif
 ifeq ($(ARCH),aarch64)
 AOM_CONF += -DAOM_TARGET_CPU=arm64
 endif
+endif
+
+ifdef HAVE_QNX
+# No runtime cpu detection
+AOM_CONF += -DCONFIG_RUNTIME_CPU_DETECT=0
 endif
 
 # libaom doesn't allow in-tree builds
