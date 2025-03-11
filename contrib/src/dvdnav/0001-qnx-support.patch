@@ -1,0 +1,11 @@
+--- a/configure.ac	2025-03-05 12:07:50.339464331 -0500
++++ b/configure.ac	2025-03-05 12:08:08.888657927 -0500
+@@ -88,6 +88,8 @@
+     ;;
+   *android*)
+     ;;
++  *nto* | *qnx*)
++    ;;
+   *)
+     AC_CHECK_LIB(pthread, pthread_create,
+         [THREAD_LIBS="-lpthread"],

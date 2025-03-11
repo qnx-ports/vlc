@@ -19,6 +19,9 @@ $(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(UNPACK)
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/dvdnav/0001-qnx-support.patch
+endif
 	$(call pkg_static,"misc/dvdnav.pc.in")
 	$(MOVE)
 
