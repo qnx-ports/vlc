@@ -256,6 +256,14 @@ check_tizen_sdk()
 	[ ${TIZEN_ABI} = "armv7l" ] && add_make_enabled "HAVE_ARMV7A"
 }
 
+check_qnx_sdp()
+{
+    [ -z "${QNX_TARGET}" ] && echo "You must source a QNX SDP" && exit 1
+    [ -z "${QNX_HOST}" ] && echo "You must source a QNX SDP" && exit 1
+
+    add_make_enabled "HAVE_LINUX" "HAVE_QNX"
+}
+
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
@@ -381,6 +389,9 @@ case "${OS}" in
 		;;
 	*solaris*)
 		add_make_enabled "HAVE_SOLARIS"
+		;;
+	*nto*)
+                check_qnx_sdp
 		;;
 esac
 

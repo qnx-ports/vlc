@@ -1,4 +1,3 @@
-# Main makefile for VLC 3rd party libraries ("contrib")
 # Copyright (C) 2003-2011 the VideoLAN team
 #
 # This file is under the same license as the vlc package.
@@ -54,6 +53,19 @@ endif
 #
 # Default values for tools
 #
+ifdef HAVE_QNX
+QNX_ARCH=gcc_nto$(ARCH)$(if $(findstring aarch64,$(ARCH)),le)
+ifneq ($(findstring $(origin CC),undefined default),)
+CC := qcc -V$(QNX_ARCH)
+LD := $(CC)
+EXTRA_CFLAGS += -D_QNX_SOURCE
+endif
+ifneq ($(findstring $(origin CXX),undefined default),)
+CXX := q++ -V$(QNX_ARCH)
+EXTRA_CPPFLAGS += -D_QNX_SOURCE
+endif
+endif
+
 ifndef HAVE_CROSS_COMPILE
 ifneq ($(findstring $(origin CC),undefined default),)
 CC := gcc
@@ -174,6 +186,7 @@ CPPFLAGS := $(CPPFLAGS) $(EXTRA_CFLAGS)
 CFLAGS := $(CFLAGS) $(EXTRA_CFLAGS)
 CXXFLAGS := $(CXXFLAGS) $(EXTRA_CFLAGS) $(EXTRA_CXXFLAGS)
 LDFLAGS := $(LDFLAGS) -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
+ASFLAGS := $(ASFLAGS) $(EXTRA_ASFLAGS)
 
 # Do not export those! Use HOSTVARS.
 
@@ -300,7 +313,8 @@ HOSTVARS_MESON := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
-	LDFLAGS="$(LDFLAGS)"
+	LDFLAGS="$(LDFLAGS)" \
+	ASFLAGS="$(ASFLAGS)"
 
 # Add these flags after Meson consumed the CFLAGS/CXXFLAGS
 # as when setting those for Meson, it would apply to tests
@@ -327,11 +341,13 @@ HOSTVARS := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
+	ASFLAGS="$(ASFLAGS)" \
 	LDFLAGS="$(LDFLAGS)"
 HOSTVARS_PIC := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS) $(PIC)" \
 	CFLAGS="$(CFLAGS) $(PIC)" \
 	CXXFLAGS="$(CXXFLAGS) $(PIC)" \
+	ASFLAGS="$(ASFLAGS) $(PIC)" \
 	LDFLAGS="$(LDFLAGS)"
 
 download_git = \
@@ -418,7 +434,13 @@ ifdef HAVE_CROSS_COMPILE
 # expected.
 MESONFLAGS += --cross-file $(abspath crossfile.meson)
 MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBDIR)" \
-	PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" meson $(MESONFLAGS)
+	PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)"
+ifdef HAVE_QNX
+# QNX's compilers need some environment variables set
+MESON += QNX_HOST="${QNX_HOST}" QNX_TARGET="${QNX_TARGET}" \
+	 QNX_CONFIGURATION_EXCLUSIVE="${QNX_CONFIGURATION_EXCLUSIVE}" QNX_CONFIGURATION="${QNX_CONFIGURATION}"
+endif
+MESON += meson $(MESONFLAGS)
 else
 MESON = meson $(MESONFLAGS)
 endif
@@ -544,6 +566,9 @@ endif
 ifdef HAVE_DARWIN_OS
 CMAKE_SYSTEM_NAME = Darwin
 endif
+ifdef HAVE_QNX
+CMAKE_SYSTEM_NAME = QNX
+endif
 
 # CMake toolchain
 toolchain.cmake:
@@ -572,6 +597,10 @@ ifdef HAVE_IOS
 else
 	echo "set(CMAKE_OSX_SYSROOT $(MACOSX_SDK))" >> $@
 endif
+else ifdef HAVE_QNX
+	echo "set(CMAKE_C_FLAGS \"$(CFLAGS)\")" >> $@
+	echo "set(CMAKE_CXX_FLAGS \"$(CXXFLAGS)\")" >> $@
+	echo "set(CMAKE_AR $(AR) CACHE FILEPATH \"Archiver\")" >> $@
 else
 	echo "set(CMAKE_AR $(AR) CACHE FILEPATH \"Archiver\")" >> $@
 endif
