@@ -40,8 +40,6 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	# fix i686 UWP builds as they were using CertEnumCRLsInStore via invalid LoadLibrary
 	$(APPLY) $(SRC)/gnutls/0001-fix-mingw64-detection.patch
 
-	$(call pkg_static,"lib/gnutls.pc.in")
-
 	# fix AArch64 builds for Apple OS by removing unsupported compiler flag (gnutls#1347, gnutls#1317)
 ifdef HAVE_DARWIN_OS
 	$(APPLY) $(SRC)/gnutls/gnutls-fix-aarch64-compilation-appleos.patch
@@ -92,5 +90,7 @@ endif
 .gnutls: gnutls
 	cd $< && $(GNUTLS_ENV) ./configure $(GNUTLS_CONF)
 	cd $< && $(MAKE) -C gl install
+	cd $< && $(MAKE) -C lib
+	$(call pkg_static,"lib/gnutls.pc")
 	cd $< && $(MAKE) -C lib install
 	touch $@
