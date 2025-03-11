@@ -1,0 +1,11 @@
+--- a/gettext-tools/configure	2025-03-06 17:30:45.118301868 -0500
++++ b/gettext-tools/configure	2025-03-06 17:32:33.788384354 -0500
+@@ -47818,7 +47818,7 @@
+   ac_cv_prog_c_openmp='none needed'
+ else
+   ac_cv_prog_c_openmp='unsupported'
+-	  	  	  	  	  	  	                                	  	  	  	  	  	  for ac_option in -fopenmp -xopenmp -openmp -mp -omp -qsmp=omp -homp \
++	  	  	  	  	  	  	                                	  	  	  	  	  	  for ac_option in -fopenmp "-Wc,-fopenmp -Wl,-lgomp" -xopenmp -openmp -mp -omp -qsmp=omp -homp \
+                            -Popenmp --openmp; do
+ 	    ac_save_CFLAGS=$CFLAGS
+ 	    CFLAGS="$CFLAGS $ac_option"
