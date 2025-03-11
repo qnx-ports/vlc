@@ -1,0 +1,19 @@
+--- a/configure	2025-03-06 13:19:11.910868707 -0500
++++ b/configure	2025-03-06 16:03:31.997854475 -0500
+@@ -4754,6 +4754,16 @@
+         _cflags_speed='-O4'
+         _cflags_size='-O2'
+         _flags_filter=cparser_flags
++    elif $_cc -V 2>&1 | head -1 | grep -q "^cc: targets available in.*" && $_cc -V 2>&1 | tail +2 | grep -q ",gcc_nto"; then
++        # QNX qcc/q++, same as GCC/G++
++        _type=gcc
++        _ident=$(qcc -V 2>&1 | tail -n +2 | head -n 1 | cut -f 1 -d , | grep -o '[^[:space:]]*')
++        _ident="gcc${_ident}"
++        # For some reason SDP8's gcc12.2.0 seems to expect a file argument to -MMD,
++        # so no reason to specify -MF
++        _depflags='-Wp,-MMD,$(@:.o=.d),-MT,$@'
++        _cflags_speed='-O3'
++        _cflags_size='-Os'
+     fi
+ 
+     eval ${pfx}_type=\$_type

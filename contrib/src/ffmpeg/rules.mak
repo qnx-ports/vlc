@@ -218,6 +218,15 @@ endif
 FFMPEGCONF += --target-os=sunos --enable-pic
 endif
 
+# QNX
+ifdef HAVE_QNX
+FFMPEGCONF += --target-os=qnx --enable-pic --extra-libs="-lm"
+
+# ffmpeg's configure defaults to using the C compiler for linking.
+# So it will try to use qcc which needs to be told the target
+LDFLAGS += -V$(QNX_ARCH)
+endif
+
 # Build
 PKGS += ffmpeg
 ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 libswscale"),)
@@ -255,6 +264,10 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-Do-not-destroy-uninitialized-mutexes-con.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-dxva2_hevc-don-t-use-frames-as-reference-if-they-are.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-x86-mathops-clip-constants-used-with-shift-i.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/ffmpeg/0001-qnx-support-qcc.patch
+endif
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
