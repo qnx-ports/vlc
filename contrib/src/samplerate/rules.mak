@@ -9,6 +9,11 @@ ifeq ($(call need_pkg,"samplerate"),)
 PKGS_FOUND += samplerate
 endif
 
+ifdef HAVE_QNX
+# qcc enables -pipe by default and doesn't actually understand the '-pipe' option
+SAMPLERATE_CONF := --disable-gcc-pipe
+endif
+
 $(TARBALLS)/libsamplerate-$(SAMPLERATE_VERSION).tar.gz:
 	$(call download_pkg,$(SAMPLERATE_URL),samplerate)
 
@@ -21,6 +26,6 @@ samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 
 .samplerate: samplerate
 	$(REQUIRE_GPL)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SAMPLERATE_CONF)
 	cd $< && $(MAKE) -C src install && $(MAKE) install-data
 	touch $@
