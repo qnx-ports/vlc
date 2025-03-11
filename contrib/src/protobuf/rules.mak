@@ -22,6 +22,9 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	mv protobuf-$(PROTOBUF_VERSION) protobuf-$(PROTOBUF_VERSION)-cpp
 	$(APPLY) $(SRC)/protobuf/dont-build-protoc.patch
 	$(APPLY) $(SRC)/protobuf/include-algorithm.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/protobuf/0001-add-support-for-64-bit-QNX-builds.patch
+endif
 	$(MOVE)
 
 .protobuf: protobuf
