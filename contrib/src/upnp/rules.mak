@@ -46,7 +46,9 @@ ifdef HAVE_WIN32
 endif
 ifdef HAVE_LINUX
 ifndef HAVE_ANDROID
+ifndef HAVE_QNX
 	$(APPLY) $(SRC)/upnp/libupnp-pthread-force.patch
+endif
 endif
 endif
 ifdef HAVE_ANDROID
