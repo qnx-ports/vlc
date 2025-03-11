@@ -15,6 +15,10 @@ $(TARBALLS)/taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/taglib/0001-use-c++11.patch
+	$(APPLY) $(SRC)/taglib/0002-qnx-use-fpic.patch
+endif
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake
