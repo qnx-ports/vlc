@@ -1,0 +1,64 @@
+--- a/CMakeLists.txt	2025-02-10 10:13:28.101387719 -0500
++++ b/CMakeLists.txt	2025-02-10 10:15:33.226686262 -0500
+@@ -41,8 +41,9 @@
+ set_if(GNU         ${CMAKE_SYSTEM_NAME} MATCHES "GNU")
+ set_if(ANDROID     ${SYSNAME_LC} MATCHES "android")
+ set_if(SUNOS       "${SYSNAME_LC}" MATCHES "sunos")
+-set_if(POSIX       LINUX OR DARWIN OR BSD OR SUNOS OR ANDROID OR (CYGWIN AND CYGWIN_USE_POSIX))
+-set_if(SYMLINKABLE LINUX OR DARWIN OR BSD OR SUNOS OR CYGWIN OR GNU)
++set_if(QNX         ${CMAKE_SYSTEM_NAME} MATCHES "QNX")
++set_if(POSIX       LINUX OR DARWIN OR BSD OR SUNOS OR ANDROID OR (CYGWIN AND CYGWIN_USE_POSIX) OR QNX)
++set_if(SYMLINKABLE LINUX OR DARWIN OR BSD OR SUNOS OR CYGWIN OR GNU OR QNX)
+ 
+ # Not sure what to do in case of compiling by MSVC.
+ # This will make installdir in C:\Program Files\SRT then
+@@ -622,6 +623,9 @@
+ elseif(SUNOS)
+ 	add_definitions(-DSUNOS=1)
+ 	message(STATUS "DETECTED SYSTEM: SunOS|Solaris;  SUNOS=1" )
++elseif(QNX)
++	add_definitions(-DQNX=1)
++	message(STATUS "DETECTED SYSTEM: QNX;  QNX=1" )
+ else()
+ 	message(FATAL_ERROR "Unsupported system: ${CMAKE_SYSTEM_NAME}")
+ endif()
+--- a/srtcore/platform_sys.h	2025-02-10 10:17:27.531545951 -0500
++++ b/srtcore/platform_sys.h	2025-02-10 10:18:39.266617633 -0500
+@@ -99,6 +99,14 @@
+ 
+ #endif
+ 
++#ifdef QNX
++
++#ifdef SRT_IMPORT_EVENT
++   #include <unistd.h>
++#endif
++
++#endif
++
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+--- a/srtcore/utilities.h	2025-02-10 10:27:56.531347072 -0500
++++ b/srtcore/utilities.h	2025-02-10 10:39:41.877009482 -0500
+@@ -230,6 +230,9 @@
+ #	define __LITTLE_ENDIAN LITTLE_ENDIAN
+ #	define __PDP_ENDIAN    PDP_ENDIAN
+ 
++#elif defined(__QNXNTO__)
++#	include <gulliver.h>
++
+ #else
+ 
+ #	error Endian: platform not supported
+--- a/srtcore/srt_compat.c	2025-03-07 11:27:47.323237582 -0500
++++ b/srtcore/srt_compat.c	2025-03-07 11:28:03.911424096 -0500
+@@ -23,7 +23,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <errno.h>
+-#if defined(__unix__) && !defined(BSD) && !defined(SUNOS)
++#if defined(__unix__) && !defined(BSD) && !defined(SUNOS) && !defined(QNX)
+ #include <features.h>
+ #endif
+ 
