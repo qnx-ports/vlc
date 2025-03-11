@@ -25,6 +25,9 @@ sidplay-libs: sidplay-libs-$(SID_VERSION).tar.gz .sum-sidplay2
 	$(APPLY) $(SRC)/sidplay2/sidplay2-string.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-fix-overflow.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-cxxtest.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/sidplay2/0001-no-narrowing-warning.patch
+endif
 	$(MOVE)
 
 .sidplay2: sidplay-libs
