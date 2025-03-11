@@ -15,10 +15,14 @@ $(TARBALLS)/orc-$(ORC_VERSION).tar.gz:
 orc: orc-$(ORC_VERSION).tar.gz .sum-orc
 	$(UNPACK)
 	$(APPLY) $(SRC)/orc/use-proper-func-detection.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/orc/0001-qnx-no-libpthread.patch
+endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .orc: orc
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

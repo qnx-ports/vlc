@@ -1,0 +1,11 @@
+--- orc/configure.ac	2025-02-06 10:20:08.163319978 -0500
++++ orc/configure.ac	2025-02-06 10:20:37.036791228 -0500
+@@ -96,7 +96,7 @@
+   mingw*|pw32*|cygwin*)
+     AC_DEFINE(HAVE_THREAD_WIN32, 1, [Use Windows thread code])
+     ;;
+-  *android*)
++  *android*|*nto*)
+     AC_DEFINE(HAVE_THREAD_PTHREAD, 1, [Use pthread thread code])
+     PTHREAD_CFLAGS=
+     PTHREAD_LIBS=
