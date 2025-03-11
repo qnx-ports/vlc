@@ -14,6 +14,9 @@ $(TARBALLS)/fribidi-$(FRIBIDI_VERSION).tar.xz:
 
 fribidi: fribidi-$(FRIBIDI_VERSION).tar.xz .sum-fribidi
 	$(UNPACK)
+ifdef HAVE_QNX
+	$(APPLY) ${SRC}/fribidi/0001-qnx-remove_ansi_compiler_flag.patch
+endif
 	$(MOVE)
 
 # FIXME: DEPS_fribidi = iconv $(DEPS_iconv)
