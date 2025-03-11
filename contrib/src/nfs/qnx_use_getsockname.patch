@@ -1,0 +1,12 @@
+--- a/lib/socket.c	2025-02-06 09:47:04.580367850 -0500
++++ b/lib/socket.c	2025-02-06 09:51:36.025120762 -0500
+@@ -166,7 +166,8 @@
+ {
+ 	int level;
+ 
+-	#if defined(__FreeBSD__) || defined(__sun) || (defined(__APPLE__) && defined(__MACH__))
++	#if defined(__FreeBSD__) || defined(__sun) || defined(__QNXNTO__) \
++            || (defined(__APPLE__) && defined(__MACH__))
+ 	struct protoent *buf;
+ 
+ 	if ((buf = getprotobyname("tcp")) != NULL)

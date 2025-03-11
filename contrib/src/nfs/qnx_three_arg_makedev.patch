@@ -1,0 +1,14 @@
+--- a/lib/nfs_v3.c	2025-02-06 09:37:45.709788455 -0500
++++ b/lib/nfs_v3.c	2025-02-06 09:39:27.114138535 -0500
+@@ -105,7 +105,11 @@
+ specdata3_to_rdev(struct specdata3 *rdev)
+ {
+ #ifdef makedev
++#if defined(__QNXNTO__)
++	return makedev(0, rdev->specdata1, rdev->specdata2);
++#else
+ 	return makedev(rdev->specdata1, rdev->specdata2);
++#endif
+ #else
+ 	return 0;
+ #endif

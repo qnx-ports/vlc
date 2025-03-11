@@ -16,6 +16,9 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(UNPACK)
 	mv libnfs-libnfs-$(NFS_VERSION) libnfs-$(NFS_VERSION)
 	$(UPDATE_AUTOCONFIG)
+	$(APPLY) $(SRC)/nfs/qnx_use_sys_time.patch
+	$(APPLY) $(SRC)/nfs/qnx_three_arg_makedev.patch
+	$(APPLY) $(SRC)/nfs/qnx_use_getsockname.patch
 	$(MOVE)
 
 .nfs: nfs
