@@ -4,7 +4,9 @@ BLURAY_VERSION := 1.3.2
 BLURAY_URL := $(VIDEOLAN)/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
+ifndef HAVE_QNX
 PKGS += bluray
+endif
 endif
 ifeq ($(call need_pkg,"libbluray >= 1.0.0"),)
 PKGS_FOUND += bluray
@@ -49,6 +51,9 @@ $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
 bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 	$(UNPACK)
 	$(APPLY) $(SRC)/bluray/0001-install-bdjo_data-header.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/bluray/0001-qnx-mutex-namespace-collision.patch
+endif
 	$(call pkg_static,"src/libbluray.pc.in")
 	$(MOVE)
 
