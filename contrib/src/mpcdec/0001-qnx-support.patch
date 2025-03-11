@@ -1,0 +1,14 @@
+--- a/CMakeLists.txt	2025-03-07 10:04:32.452842367 -0500
++++ b/CMakeLists.txt	2025-03-07 10:09:05.846702706 -0500
+@@ -16,7 +16,10 @@
+ add_definitions(-DFAST_MATH -DCVD_FASTLOG)
+ 
+ if(NOT MSVC)
+-  add_definitions(-O3 -Wall -fomit-frame-pointer -pipe)
++  add_definitions(-O3 -Wall -fomit-frame-pointer)
++  if(NOT CMAKE_SYSTEM_NAME STREQUAL QNX)
++    add_definitions(-pipe)
++  endif()
+ endif(NOT MSVC)
+ 
+ add_subdirectory(libmpcdec)

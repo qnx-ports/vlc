@@ -31,6 +31,9 @@ musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 ifdef HAVE_VISUALSTUDIO
 	$(APPLY) $(SRC)/mpcdec/musepack-asinh-msvc.patch
 endif
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/mpcdec/0001-qnx-support.patch
+endif
 	sed -i.orig \
 		-e 's,^add_subdirectory(mpcgain),,g' \
 		-e 's,^add_subdirectory(mpcchap),,g' \
