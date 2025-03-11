@@ -1,0 +1,11 @@
+--- a/src/plugins/platforms/qnx/qqnxrasterwindow.cpp	2025-02-28 11:01:33.260154435 -0500
++++ b/src/plugins/platforms/qnx/qqnxrasterwindow.cpp	2025-02-28 11:01:44.840231667 -0500
+@@ -151,7 +151,7 @@
+                                 "Failed to clear window buffer");
+         }
+ 
+-        Q_SCREEN_CHECKERROR(screen_flush_blits(screen()->nativeContext(), 0),
++        Q_SCREEN_CHECKERROR(screen_flush_blits(screen()->nativeContext(), SCREEN_WAIT_IDLE),
+                             "Failed to flush blits");
+ 
+         // Use the first available render buffer

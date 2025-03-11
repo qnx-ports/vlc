@@ -42,6 +42,11 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0018-Remove-qtypetraits.h-s-contents-altogether.patch
 	$(APPLY) $(SRC)/qt/0019-QFileSystemEngine-only-define-FILE_ID_INFO-for-build.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/qt/0001-qnx-fix-slog2-support.patch
+	$(APPLY) $(SRC)/qt/0002-qnx-enable-root-window.patch
+	$(APPLY) $(SRC)/qt/0003-qnx-flush-clear.patch
+endif
 	$(MOVE)
 
 ifdef HAVE_MACOSX
@@ -58,6 +63,12 @@ QT_SPEC := win32-g++
 endif
 QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
 endif
+ifdef HAVE_QNX
+QT_SPEC := qnx-$(subst gcc_nto,,$(QNX_ARCH))-qcc
+# QNX uses x86_64 but QT_SPEC/QT_PLATFORM wants x86-64
+QT_SPEC := $(subst x86_64,x86-64,$(QT_SPEC))
+QT_PLATFORM := -xplatform $(QT_SPEC)
+endif
 
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -no-dbus \
@@ -65,6 +76,11 @@ QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-compile-examples -nomake examples
 
 QT_CONFIG += -release
+ifdef HAVE_QNX
+# Make sure that the system zlib isn't used as QT seems to assume that it is
+# using its built-in copy of zlib
+QT_CONFIG += -qt-zlib
+endif
 
 .qt: qt
 	cd $< && $(QT_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
@@ -75,7 +91,11 @@ QT_CONFIG += -release
 	cd $< && $(MAKE) -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets
 	# Install plugins
 	cd $< && $(MAKE) -C src/plugins sub-platforms-install_subtargets
+ifdef HAVE_QNX
+	mv $(PREFIX)/plugins/platforms/libqqnx.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
+else
 	mv $(PREFIX)/plugins/platforms/libqwindows.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
+endif
 	# Move includes to match what VLC expects
 	mkdir -p $(PREFIX)/include/QtGui/qpa
 	cp $(PREFIX)/include/QtGui/$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h $(PREFIX)/include/QtGui/qpa
@@ -83,16 +103,25 @@ QT_CONFIG += -release
 	rm -rf $(PREFIX)/lib/libQt5Bootstrap* $</lib/libQt5Bootstrap*
 	# Fix .pc files to remove debug version (d)
 	cd $(PREFIX)/lib/pkgconfig; for i in Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc; do sed -i -e 's/d\.a/.a/g' -e 's/d $$/ /' $$i; done
+ifdef HAVE_QNX
+	# Fix Qt5Gui.pc file to include qqnx (QQnxIntegrationPlugin), all the things libqqnx needs, and Qt5Platform Support
+	cd $(PREFIX)/lib/pkgconfig; sed -i -e 's/ -lQt5Gui/ -lqqnx -lfreetype -lfontconfig -lz -lscreen -lQt5PlatformSupport -lQt5Gui/g' Qt5Gui.pc
+	# Update all the pkg-config files to use static linking
+	for i in ${PREFIX}/lib/pkgconfig/Qt5*.pc; do $(SRC)/pkg-static.sh $$i; done
+else
 	# Fix Qt5Gui.pc file to include qwindows (QWindowsIntegrationPlugin) and Qt5Platform Support
 	cd $(PREFIX)/lib/pkgconfig; sed -i -e 's/ -lQt5Gui/ -lqwindows -lQt5PlatformSupport -lQt5Gui/g' Qt5Gui.pc
+endif
 ifdef HAVE_CROSS_COMPILE
 	# Building Qt build tools for Xcompilation
 	cd $</include/QtCore; $(LN_S)f $(QT_VERSION)/QtCore/private private
 	cd $<; $(MAKE) -C qmake
 	cd $<; $(MAKE) install_qmake install_mkspecs
+ifndef HAVE_QNX
 	cd $</src/tools; \
 	for i in bootstrap uic rcc moc; \
 		do (cd $$i; echo $$i && ../../../bin/qmake -spec $(QT_SPEC) && $(MAKE) clean && $(MAKE) CC=$(HOST)-gcc CXX=$(HOST)-g++ LINKER=$(HOST)-g++ LIB="$(HOST)-ar -rc" && $(MAKE) install); \
 	done
+endif
 endif
 	touch $@
