@@ -22,6 +22,9 @@ endif
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/winrt.patch
 endif
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/libarchive/0001-qnx-fix-lz4-path.patch
+endif
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 

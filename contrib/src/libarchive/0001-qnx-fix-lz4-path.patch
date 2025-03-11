@@ -1,0 +1,68 @@
+--- a/libarchive/archive_read_support_filter_lz4.c	2025-02-08 20:52:29.247572860 -0500
++++ b/libarchive/archive_read_support_filter_lz4.c	2025-02-08 20:53:18.929575689 -0500
+@@ -43,6 +43,9 @@
+ #ifdef HAVE_LZ4_H
+ #include <lz4.h>
+ #endif
++#ifdef HAVE_LZ4_LZ4_H
++#include <lz4/lz4.h>
++#endif
+ 
+ #include "archive.h"
+ #include "archive_endian.h"
+--- a/libarchive/archive_util.c	2025-02-08 20:52:29.245572860 -0500
++++ b/libarchive/archive_util.c	2025-02-08 20:53:30.319576338 -0500
+@@ -57,6 +57,9 @@
+ #ifdef HAVE_LZ4_H
+ #include <lz4.h>
+ #endif
++#ifdef HAVE_LZ4_LZ4_H
++#include <lz4/lz4.h>
++#endif
+ 
+ #include "archive.h"
+ #include "archive_private.h"
+--- a/libarchive/archive_version_details.c	2025-02-08 20:52:29.249572860 -0500
++++ b/libarchive/archive_version_details.c	2025-02-08 20:54:09.291578557 -0500
+@@ -45,6 +45,9 @@
+ #ifdef HAVE_LZ4_H
+ #include <lz4.h>
+ #endif
++#ifdef HAVE_LZ4_LZ4_H
++#include <lz4/lz4.h>
++#endif
+ #ifdef HAVE_ZSTD_H
+ #include <zstd.h>
+ #endif
+--- a/libarchive/archive_write_add_filter_lz4.c	2025-02-08 20:52:29.251572860 -0500
++++ b/libarchive/archive_write_add_filter_lz4.c	2025-02-08 20:54:29.308579697 -0500
+@@ -40,9 +40,15 @@
+ #ifdef HAVE_LZ4_H
+ #include <lz4.h>
+ #endif
++#ifdef HAVE_LZ4_LZ4_H
++#include <lz4/lz4.h>
++#endif
+ #ifdef HAVE_LZ4HC_H
+ #include <lz4hc.h>
+ #endif
++#ifdef HAVE_LZ4_LZ4HC_H
++#include <lz4/lz4hc.h>
++#endif
+ 
+ #include "archive.h"
+ #include "archive_endian.h"
+--- a/configure.ac	2025-02-08 20:58:27.005593233 -0500
++++ b/configure.ac	2025-02-08 21:01:49.401604759 -0500
+@@ -391,7 +391,10 @@
+   AS_HELP_STRING([--without-lz4], [Don't build support for lz4 through liblz4]))
+ 
+ if test "x$with_lz4" != "xno"; then
+-  AC_CHECK_HEADERS([lz4.h lz4hc.h])
++  AC_CHECK_HEADERS([lz4.h],,
++    AC_CHECK_HEADERS([lz4/lz4.h]))
++  AC_CHECK_HEADERS([lz4hc.h],,
++    AC_CHECK_HEADERS([lz4/lz4hc.h]))
+   AC_CHECK_LIB(lz4,LZ4_decompress_safe)
+ fi
+ 
