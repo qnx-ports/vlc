@@ -28,5 +28,7 @@ DEPS_SDL_image = jpeg $(DEPS_jpeg) tiff $(DEPS_tiff) \
 
 .SDL_image: SDL_image
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-tif --disable-sdltest --disable-png
+	cd $< && $(MAKE)
+	$(call pkg_static,"SDL_image.pc")
 	cd $< && $(MAKE) install
 	touch $@
