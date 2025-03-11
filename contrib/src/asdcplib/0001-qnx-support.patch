@@ -1,0 +1,122 @@
+--- a/src/KM_fileio.cpp	2025-03-11 09:40:50.742263429 -0400
++++ b/src/KM_fileio.cpp	2025-03-11 10:05:15.633477271 -0400
+@@ -52,6 +52,12 @@
+ #include <sys/sysctl.h>
+ #endif
+ 
++#if defined(__QNXNTO__)
++#include <fstream>
++#include <string>
++#include <unistd.h>
++#endif
++
+ using namespace Kumu;
+ 
+ #ifdef KM_WIN32
+@@ -69,6 +75,8 @@
+ #else
+ # if defined(__linux__)
+ #   include <sys/statfs.h>
++# elif defined(__QNXNTO__)
++#   include <sys/statvfs.h>
+ # else
+ #  include <sys/param.h>
+ #  include <sys/mount.h>
+@@ -685,6 +693,14 @@
+   char program[MAXPATHLEN];
+   snprintf(program, MAXPATHLEN, "/proc/%d/path/a.out", getpid());
+   ssize_t rc = readlink(program, path, size);
++#elif defined(__QNXNTO__)
++  std::string exepath;
++  std::ifstream fin("/proc/self/exefile");
++  std::getline(fin, exepath);
++  size_t size = X_BUFSIZE;
++  ssize_t rc = readlink(exepath.c_str(), path, size);
++  success = ( rc != -1 );
++
+ #else
+ #error GetExecutablePath --> Create a method for obtaining the executable name
+ #endif
+@@ -1478,7 +1494,7 @@
+   if ( m_Handle == 0 )
+     return RESULT_FILEOPEN;
+ 
+-#if (defined(__sun) && defined(__SVR4)) || defined(_WIN32)
++#if (defined(__sun) && defined(__SVR4)) || defined(_WIN32) || defined(__QNXNTO__)
+   struct stat s;
+ #endif
+   struct dirent* entry;
+@@ -1493,7 +1509,7 @@
+ 
+   next_item_name.assign(entry->d_name, strlen(entry->d_name));
+ 
+-#if (defined(__sun) && defined(__SVR4)) || defined(_WIN32)
++#if (defined(__sun) && defined(__SVR4)) || defined(_WIN32) || defined(__QNXNTO__)
+ 
+   stat(entry->d_name, &s);
+ 
+@@ -1722,7 +1738,11 @@
+   DefaultLogSink().Error("FreeSpaceForPath GetDiskFreeSpaceEx %s: %lu\n", path.c_str(), last_error);
+   return RESULT_FAIL;
+ #else // KM_WIN32
++#if defined(__QNXNTO__)
++  struct statvfs s;
++#else
+   struct statfs s;
++#endif
+ 
+ #if defined(__sun) && defined(__SVR4)
+   if ( statfs(path.c_str(), &s, s.f_bsize, s.f_fstyp ) == 0 )
+@@ -1738,7 +1758,11 @@
+       return RESULT_OK;
+     }
+ #else
++#if defined(__QNXNTO__)
++  if ( statvfs(path.c_str(), &s) == 0 )
++#else
+   if ( statfs(path.c_str(), &s) == 0 )
++#endif
+     {
+       if ( s.f_blocks < 1 )
+ 	{
+--- a/configure.ac	2025-03-11 10:44:47.028975676 -0400
++++ b/configure.ac	2025-03-11 10:50:39.683088791 -0400
+@@ -49,14 +49,16 @@
+ # Checks for programs.
+ AC_CANONICAL_BUILD
+ AC_CANONICAL_HOST
++openbsd_host=false
++qnx_host=false
+ case $host_os in
+        openbsd*) openbsd_host=true ;;
+        cygwin* | mingw32*)
+-            openbsd_host=false
+             CPPFLAGS="${CPPFLAGS} -DKM_WIN32" ;;
+-       *)        openbsd_host=false ;;
++       nto-qnx*) qnx_host=true ;;
+ esac
+ AM_CONDITIONAL([OPENBSD_HOST], [test x$openbsd_host = xtrue])
++AM_CONDITIONAL([QNX_HOST], [test x$qnx_host = xtrue])
+ AC_PROG_CC
+ AC_PROG_CXX
+ AC_PROG_LIBTOOL
+--- a/src/Makefile.am	2025-03-11 11:00:25.830106301 -0400
++++ b/src/Makefile.am	2025-03-11 10:47:41.396997584 -0400
+@@ -104,6 +104,9 @@
+ 
+ # linker flags (*not* including libraries to link against) for a library
+ libkumu_la_LDFLAGS = -release @VERSION@
++if QNX_HOST
++libkumu_la_LIBADD = -lregex
++endif
+ 
+ 
+ # sources for asdcp library that don't get added to a distribution
+--- a/asdcplib.pc.in	2025-03-11 11:29:40.053486178 -0400
++++ b/asdcplib.pc.in	2025-03-11 11:29:57.347695632 -0400
+@@ -7,4 +7,4 @@
+ Description: The asdcp library
+ Version: 2.7.19
+ Cflags: -I${includedir}
+-Libs: -L${libdir} -lasdcp -lkumu -lnettle -lgmp
++Libs: -L${libdir} -lasdcp -lkumu -lregex -lnettle -lgmp

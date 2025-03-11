@@ -16,7 +16,14 @@ ifeq ($(call need_pkg,"asdcplib >= 1.12"),)
 PKGS_FOUND += asdcplib
 endif
 
-ASDCPLIB_CXXFLAGS := $(CXXFLAGS) -std=gnu++98
+ASDCPLIB_CXXFLAGS := $(CXXFLAGS)
+ifdef HAVE_QNX
+# QNX uses GCC and libc++, and libc++ only supports C++03 (and earlier)
+# when compiled with clang. Work around this by bumping the C++ version.
+ASDCPLIB_CXXFLAGS += -std=gnu++11
+else
+ASDCPLIB_CXXFLAGS += -std=gnu++98
+endif
 
 $(TARBALLS)/asdcplib-$(ASDCPLIB_VERSION).tar.gz:
 	$(call download_pkg,$(ASDCPLIB_URL),asdcplib)
@@ -31,6 +38,9 @@ asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz .sum-asdcplib
 	$(APPLY) $(SRC)/asdcplib/win32-cross-compilation.patch
 	$(APPLY) $(SRC)/asdcplib/win32-dirent.patch
 	$(APPLY) $(SRC)/asdcplib/0001-Remove-a-broken-unused-template-class.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/asdcplib/0001-qnx-support.patch
+endif
 	$(MOVE)
 
 DEPS_asdcplib = nettle $(DEPS_nettle)
