@@ -24,6 +24,9 @@ endif
 	$(APPLY) $(SRC)/gpg-error/win32-unicode.patch
 	$(APPLY) $(SRC)/gpg-error/version-bump-gawk-5.patch
 	$(APPLY) $(SRC)/gpg-error/win32-extern-struct.patch
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/gpg-error/0001-qnx-support.patch
+endif
 	$(MOVE)
 ifdef HAVE_ANDROID
 ifeq ($(ARCH),aarch64)
@@ -49,6 +52,10 @@ else
 endif
 endif
 endif
+ifdef HAVE_QNX
+	cp $(SRC)/gpg-error/lock-obj-pub.nto-qnx*.h $@/src/syscfg
+endif
+
 
 .gpg-error: libgpg-error
 	$(RECONF)

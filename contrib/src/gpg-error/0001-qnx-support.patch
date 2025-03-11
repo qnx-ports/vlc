@@ -1,0 +1,46 @@
+--- a/configure.ac	2025-03-06 16:57:13.070631917 -0500
++++ b/configure.ac	2025-03-06 16:58:27.702387164 -0500
+@@ -85,6 +85,7 @@
+ have_w32_system=no
+ have_w64_system=no
+ have_w32ce_system=no
++have_qnx_system=no
+ case "${host}" in
+     x86_64-*mingw32*)
+         have_w32_system=yes
+@@ -97,6 +98,9 @@
+     *-mingw32*)
+         have_w32_system=yes
+         ;;
++    *-nto-qnx*)
++        have_qnx_system=yes
++        ;;
+     *)
+        ;;
+ esac
+@@ -495,6 +499,7 @@
+ AM_CONDITIONAL(HAVE_W32_SYSTEM, test "$have_w32_system" = yes)
+ AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
+ AM_CONDITIONAL(HAVE_W32CE_SYSTEM, test "$have_w32ce_system" = yes)
++AM_CONDITIONAL(HAVE_QNX_SYSTEM, test "$have_qnx_system" = yes)
+ AM_CONDITIONAL(CROSS_COMPILING, test x$cross_compiling = xyes)
+ AM_CONDITIONAL(FORCE_USE_SYSCFG, test x$force_use_syscfg = xyes)
+ 
+--- a/src/Makefile.am	2025-03-06 16:59:56.792288424 -0500
++++ b/src/Makefile.am	2025-03-06 17:04:17.285718094 -0500
+@@ -220,9 +220,14 @@
+ 	$(AWK) -f $(srcdir)/mkerrnos.awk $(srcdir)/errnos.in >$@
+ 
+ # It is correct to use $(CPP).  We want the host's idea of the error codes.
++if HAVE_QNX_SYSTEM
++no_line_markers := -Wp,-P
++else
++no_line_markers := -P
++endif
+ mkerrcodes.h: Makefile mkerrcodes.awk $(gpg_extra_headers)
+ 	$(AWK) -f $(srcdir)/mkerrcodes1.awk $(srcdir)/errnos.in >_$@
+-	$(CPP) $(CPPFLAGS) $(extra_cppflags) -P _$@ | grep GPG_ERR_ | \
++	$(CPP) $(CPPFLAGS) $(extra_cppflags) $(no_line_markers) _$@ | grep GPG_ERR_ | \
+                $(AWK) -f $(srcdir)/mkerrcodes.awk >$@
+ 	-rm _$@
+ 
