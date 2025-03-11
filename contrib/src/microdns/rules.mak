@@ -19,6 +19,9 @@ $(TARBALLS)/microdns-$(LIBMICRODNS_VERSION).tar.xz:
 
 microdns: microdns-$(LIBMICRODNS_VERSION).tar.xz .sum-microdns
 	$(UNPACK)
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/microdns/0001-qnx-is-like-unix.patch
+endif
 	$(MOVE)
 
 .microdns: microdns crossfile.meson

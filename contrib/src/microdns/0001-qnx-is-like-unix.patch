@@ -1,0 +1,48 @@
+--- a/compat/compat.h	2025-02-10 09:11:26.833451024 -0500
++++ b/compat/compat.h	2025-02-10 09:11:45.589567021 -0500
+@@ -34,7 +34,7 @@
+  * POSIX systems
+  */
+ 
+-#if defined (__unix__) || defined (__APPLE__)
++#if defined (__unix__) || defined (__APPLE__) || defined (__QNXNTO__)
+ 
+ # include <unistd.h>
+ # include <sys/socket.h>
+@@ -55,7 +55,7 @@
+ static inline int os_close(sock_t s) {return (close(s));}
+ static inline int os_wouldblock(void) {return (errno == EWOULDBLOCK);}
+ 
+-#endif // __unix__ || (__APPLE__)
++#endif // __unix__ || (__APPLE__) || defined (__QNXNTO__)
+ 
+ /*
+  * Windows glue
+--- a/compat/compat.c	2025-02-10 09:11:05.456307856 -0500
++++ b/compat/compat.c	2025-02-10 09:11:19.600403978 -0500
+@@ -27,12 +27,12 @@
+ #include "compat.h"
+ #include "utils.h"
+ 
+-#if defined (__unix__) || defined (__APPLE__)
++#if defined (__unix__) || defined (__APPLE__) || defined (__QNXNTO__)
+ struct timeval os_deadline = {
+         .tv_sec = 0,
+         .tv_usec = 100000,
+ };
+-#endif // __unix__ || (__APPLE__)
++#endif // __unix__ || (__APPLE__) || defined (__QNXNTO__)
+ 
+ #if defined (_WIN32)
+ uint32_t os_deadline = 1000;
+--- a/include/microdns/rr.h	2025-02-10 09:12:03.234669092 -0500
++++ b/include/microdns/rr.h	2025-02-10 09:12:14.993733774 -0500
+@@ -29,7 +29,7 @@
+ 
+ #include <stdint.h>
+ 
+-#if defined (__unix__) || defined (__APPLE__)
++#if defined (__unix__) || defined (__APPLE__) || defined (__QNXNTO__)
+ # include <arpa/inet.h>
+ #elif defined(_WIN32)
+ # include <ws2tcpip.h>
