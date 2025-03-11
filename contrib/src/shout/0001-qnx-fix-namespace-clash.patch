@@ -1,0 +1,319 @@
+--- a/src/common/thread/thread.c	2025-02-10 09:23:17.310574759 -0500
++++ b/src/common/thread/thread.c	2025-02-10 09:23:53.868842180 -0500
+@@ -130,9 +130,9 @@
+ static int _free_thread(void *key);
+ 
+ /* mutex fuctions */
+-static void _mutex_create(mutex_t *mutex);
+-static void _mutex_lock(mutex_t *mutex);
+-static void _mutex_unlock(mutex_t *mutex);
++static void shout_mutex_create(mutex_t *mutex);
++static void shout_mutex_lock(mutex_t *mutex);
++static void shout_mutex_unlock(mutex_t *mutex);
+ 
+ /* misc thread stuff */
+ static void *_start_routine(void *arg);
+@@ -161,14 +161,14 @@
+     /* we have to create this one by hand, because there's no
+     ** mutextree_mutex to lock yet! 
+     */
+-    _mutex_create(&_mutextree_mutex);
++    shout_mutex_create(&_mutextree_mutex);
+ 
+     _mutextree_mutex.mutex_id = _next_mutex_id++;
+     avl_insert(_mutextree, (void *)&_mutextree_mutex);
+ #endif
+ 
+     thread_mutex_create(&_threadtree_mutex);
+     thread_mutex_create(&_library_mutex);    
+ 
+     /* initialize the thread tree and insert the main thread */
+ 
+@@ -287,9 +287,9 @@
+         thread->line = line;
+         thread->file = strdup(file);
+ 
+-        _mutex_lock (&_threadtree_mutex);    
++        shout_mutex_lock (&_threadtree_mutex);    
+         thread->thread_id = _next_thread_id++;
+-        _mutex_unlock (&_threadtree_mutex);
++        shout_mutex_unlock (&_threadtree_mutex);
+ 
+         thread->name = strdup(name);
+         thread->create_time = time(NULL);
+@@ -324,11 +324,11 @@
+     return NULL;
+ }
+ 
+-/* _mutex_create
++/* shout_mutex_create
+ ** 
+ ** creates a mutex
+ */
+-static void _mutex_create(mutex_t *mutex)
++static void shout_mutex_create(mutex_t *mutex)
+ {
+ #ifdef DEBUG_MUTEXES
+     mutex->thread_id = MUTEX_STATE_NEVERLOCKED;
+@@ -338,15 +338,15 @@
+     pthread_mutex_init(&mutex->sys_mutex, NULL);
+ }
+ 
+ void thread_mutex_create_c(mutex_t *mutex, int line, char *file)
+ {
+-    _mutex_create(mutex);
++    shout_mutex_create(mutex);
+ 
+ #ifdef DEBUG_MUTEXES
+-    _mutex_lock(&_mutextree_mutex);
++    shout_mutex_lock(&_mutextree_mutex);
+     mutex->mutex_id = _next_mutex_id++;
+     avl_insert(_mutextree, (void *)mutex);
+-    _mutex_unlock(&_mutextree_mutex);
++    shout_mutex_unlock(&_mutextree_mutex);
+ #endif
+ }
+ 
+@@ -355,13 +355,13 @@
+     pthread_mutex_destroy(&mutex->sys_mutex);
+ 
+ #ifdef DEBUG_MUTEXES
+-    _mutex_lock(&_mutextree_mutex);
++    shout_mutex_lock(&_mutextree_mutex);
+     avl_delete(_mutextree, mutex, _free_mutex);
+-    _mutex_unlock(&_mutextree_mutex);
++    shout_mutex_unlock(&_mutextree_mutex);
+ #endif
+ }
+ 
+ void thread_mutex_lock_c(mutex_t *mutex, int line, char *file)
+ {
+ #ifdef DEBUG_MUTEXES
+     thread_type *th = thread_self();
+@@ -380,7 +380,7 @@
+         avl_node *node;
+         mutex_t *tmutex;
+ 
+-        _mutex_lock(&_mutextree_mutex);
++        shout_mutex_lock(&_mutextree_mutex);
+ 
+         node = avl_get_first (_mutextree);
+         
+@@ -393,7 +393,7 @@
+                     LOG_ERROR7("DEADLOCK AVOIDED (%d == %d) on mutex [%s] in file %s line %d by thread %d [%s]", 
+                          tmutex->thread_id, th->thread_id, mutex->name ? mutex->name : "undefined", file, line, th->thread_id, th->name);
+ 
+-                    _mutex_unlock(&_mutextree_mutex);
++                    shout_mutex_unlock(&_mutextree_mutex);
+                     return;
+                 }
+             } else if (tmutex->thread_id == th->thread_id) { 
+@@ -413,13 +413,13 @@
+             }
+         }
+         
+-        _mutex_unlock(&_mutextree_mutex);
++        shout_mutex_unlock(&_mutextree_mutex);
+     }
+ # endif /* CHECK_MUTEXES */
+     
+-    _mutex_lock(mutex);
++    shout_mutex_lock(mutex);
+     
+-    _mutex_lock(&_mutextree_mutex);
++    shout_mutex_lock(&_mutextree_mutex);
+ 
+     LOG_DEBUG2("Locked %p by thread %d", mutex, th ? th->thread_id : -1);
+     mutex->line = line;
+@@ -427,13 +427,13 @@
+         mutex->thread_id = th->thread_id;
+     }
+ 
+-    _mutex_unlock(&_mutextree_mutex);
++    shout_mutex_unlock(&_mutextree_mutex);
+ #else
+-    _mutex_lock(mutex);
++    shout_mutex_lock(mutex);
+ #endif /* DEBUG_MUTEXES */
+ }
+ 
+ void thread_mutex_unlock_c(mutex_t *mutex, int line, char *file)
+ {
+ #ifdef DEBUG_MUTEXES
+     thread_type *th = thread_self();
+@@ -452,7 +452,7 @@
+         avl_node *node;
+         mutex_t *tmutex;
+ 
+-        _mutex_lock(&_mutextree_mutex);
++        shout_mutex_lock(&_mutextree_mutex);
+ 
+         while (node) {
+             tmutex = (mutex_t *)node->key;
+@@ -461,7 +461,7 @@
+                 if (tmutex->thread_id != th->thread_id) {
+                     LOG_ERROR7("ILLEGAL UNLOCK (%d != %d) on mutex [%s] in file %s line %d by thread %d [%s]", tmutex->thread_id, th->thread_id, 
+                          mutex->name ? mutex->name : "undefined", file, line, th->thread_id, th->name);
+-                    _mutex_unlock(&_mutextree_mutex);
++                    shout_mutex_unlock(&_mutextree_mutex);
+                     return;
+                 }
+             } else if (tmutex->thread_id == th->thread_id) {
+@@ -478,13 +478,13 @@
+                  _multi_mutex.thread_id, th->thread_id, th->thread_id, th->name, mutex->name ? mutex->name : "undefined", file, line);
+         }
+ 
+-        _mutex_unlock(&_mutextree_mutex);
++        shout_mutex_unlock(&_mutextree_mutex);
+     }
+ # endif  /* CHECK_MUTEXES */
+ 
+-    _mutex_unlock(mutex);
++    shout_mutex_unlock(mutex);
+ 
+-    _mutex_lock(&_mutextree_mutex);
++    shout_mutex_lock(&_mutextree_mutex);
+ 
+     LOG_DEBUG2("Unlocked %p by thread %d", mutex, th ? th->thread_id : -1);
+     mutex->line = -1;
+@@ -492,9 +492,9 @@
+         mutex->thread_id = MUTEX_STATE_NOTLOCKED;
+     }
+ 
+-    _mutex_unlock(&_mutextree_mutex);
++    shout_mutex_unlock(&_mutextree_mutex);
+ #else
+-    _mutex_unlock(mutex);
++    shout_mutex_unlock(mutex);
+ #endif /* DEBUG_MUTEXES */
+ }
+ 
+@@ -574,7 +574,7 @@
+         mutex_t *tmutex;
+         char name[40];
+ 
+-        _mutex_lock(&_mutextree_mutex);
++        shout_mutex_lock(&_mutextree_mutex);
+ 
+         while (node) {
+             tmutex = (mutex_t *)node->key;
+@@ -587,7 +587,7 @@
+             node = avl_get_next (node);
+         }
+ 
+-        _mutex_unlock(&_mutextree_mutex);
++        shout_mutex_unlock(&_mutextree_mutex);
+     }
+ #endif
+     
+@@ -597,9 +597,9 @@
+         LOG_INFO4("Removing thread %d [%s] started at [%s:%d], reason: 'Thread Exited'", th->thread_id, th->name, th->file, th->line);
+ #endif
+ 
+-        _mutex_lock(&_threadtree_mutex);
++        shout_mutex_lock(&_threadtree_mutex);
+         avl_delete(_threadtree, th, _free_thread);
+-        _mutex_unlock(&_threadtree_mutex);
++        shout_mutex_unlock(&_threadtree_mutex);
+     }
+ 
+     pthread_exit ((void*)val);
+@@ -647,10 +647,10 @@
+     _block_signals();
+ 
+     /* insert thread into thread tree here */
+-    _mutex_lock(&_threadtree_mutex);
++    shout_mutex_lock(&_threadtree_mutex);
+     thread->sys_thread = pthread_self();
+     avl_insert(_threadtree, (void *)thread);
+-    _mutex_unlock(&_threadtree_mutex);
++    shout_mutex_unlock(&_threadtree_mutex);
+ 
+ #ifdef THREAD_DEBUG
+     LOG_INFO4("Added thread %d [%s] started at [%s:%d]", thread->thread_id, thread->name, thread->file, thread->line);
+@@ -663,9 +663,9 @@
+ 
+     if (thread->detached)
+     {
+-        _mutex_lock (&_threadtree_mutex);
++        shout_mutex_lock (&_threadtree_mutex);
+         avl_delete (_threadtree, thread, _free_thread);
+-        _mutex_unlock (&_threadtree_mutex);
++        shout_mutex_unlock (&_threadtree_mutex);
+     }
+ 
+     return NULL;
+@@ -677,13 +677,13 @@
+     thread_type *th;
+     pthread_t sys_thread = pthread_self();
+ 
+-    _mutex_lock(&_threadtree_mutex);
++    shout_mutex_lock(&_threadtree_mutex);
+ 
+     if (_threadtree == NULL) {
+ #ifdef THREAD_DEBUG
+         LOG_WARN("Thread tree is empty, this must be wrong!");
+ #endif
+-        _mutex_unlock(&_threadtree_mutex);
++        shout_mutex_unlock(&_threadtree_mutex);
+         return NULL;
+     }
+     
+@@ -693,13 +693,13 @@
+         th = (thread_type *)node->key;
+ 
+         if (th && pthread_equal(sys_thread, th->sys_thread)) {
+-            _mutex_unlock(&_threadtree_mutex);
++            shout_mutex_unlock(&_threadtree_mutex);
+             return th;
+         }
+         
+         node = avl_get_next(node);
+     }
+-    _mutex_unlock(&_threadtree_mutex);
++    shout_mutex_unlock(&_threadtree_mutex);
+ 
+ 
+ #ifdef THREAD_DEBUG
+@@ -719,25 +719,25 @@
+     th->name = strdup(name);
+ }
+ 
+-static void _mutex_lock(mutex_t *mutex) 
++static void shout_mutex_lock(mutex_t *mutex) 
+ {
+     pthread_mutex_lock(&mutex->sys_mutex);
+ }
+ 
+-static void _mutex_unlock(mutex_t *mutex)
++static void shout_mutex_unlock(mutex_t *mutex)
+ {
+     pthread_mutex_unlock(&mutex->sys_mutex);
+ }
+ 
+ 
+ void thread_library_lock(void)
+ {
+-    _mutex_lock(&_library_mutex);
++    shout_mutex_lock(&_library_mutex);
+ }
+ 
+ void thread_library_unlock(void)
+ {
+-    _mutex_unlock(&_library_mutex);
++    shout_mutex_unlock(&_library_mutex);
+ }
+ 
+ void thread_join(thread_type *thread)
+@@ -746,9 +746,9 @@
+     int i;
+ 
+     i = pthread_join(thread->sys_thread, &ret);
+-    _mutex_lock(&_threadtree_mutex);
++    shout_mutex_lock(&_threadtree_mutex);
+     avl_delete(_threadtree, thread, _free_thread);
+-    _mutex_unlock(&_threadtree_mutex);
++    shout_mutex_unlock(&_threadtree_mutex);
+ }
+ 
+ /* AVL tree functions */
