@@ -18,6 +18,9 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.xz:
 
 matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(UNPACK)
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/matroska/0001-qnx-enable-pic.patch
+endif
 	$(call pkg_static,"libmatroska.pc.in")
 	$(MOVE)
 
