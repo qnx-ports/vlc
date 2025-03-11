@@ -1,0 +1,21 @@
+--- a/CMakeLists.txt	2025-03-11 13:44:55.790484651 -0400
++++ b/CMakeLists.txt	2025-03-11 13:46:44.948833078 -0400
+@@ -71,6 +71,7 @@
+ endif()
+ 
+ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
++option(BUILD_ENABLE_PIC "Explicitly enable PIC. Useful when BUILD_SHARED_LIBS is disabled" OFF)
+ option(BUILD_TOOLS "Build command line tools" OFF)
+ option(BUILD_TESTS "Build test suite" OFF)
+ 
+--- a/src/CMakeLists.txt	2025-03-11 13:47:42.284541342 -0400
++++ b/src/CMakeLists.txt	2025-03-11 13:47:59.845758278 -0400
+@@ -66,7 +66,7 @@
+ endif()
+ 
+ add_library(chromaprint_objs OBJECT ${chromaprint_SOURCES})
+-if(BUILD_SHARED_LIBS)
++if(BUILD_SHARED_LIBS OR BUILD_ENABLE_PIC)
+ 	set_target_properties(chromaprint_objs PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+ endif()
+ 
