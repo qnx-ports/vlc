@@ -14,6 +14,9 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 
 ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/ebml/0001-qnx-enable-fpic.patch
+endif
 	$(MOVE)
 
 .ebml: ebml toolchain.cmake

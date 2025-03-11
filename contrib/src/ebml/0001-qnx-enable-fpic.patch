@@ -1,0 +1,10 @@
+--- a/CMakeLists.txt	2025-02-07 15:48:15.144152289 -0500
++++ b/CMakeLists.txt	2025-02-07 15:48:33.519291690 -0500
+@@ -10,6 +10,7 @@
+ 
+ set(CMAKE_CXX_STANDARD 14)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
++set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+ 
+ set(libebml_SOURCES
+   src/Debug.cpp
