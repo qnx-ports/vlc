@@ -163,9 +163,17 @@ VPX_HOSTVARS = $(HOSTVARS)
 endif
 endif
 
+ifdef HAVE_QNX
+# Set HOSTVARs directly to use QNX's cross compiler
+VPX_HOSTVARS = $(HOSTVARS)
+
+# Explicitly disable runtime CPU detection for QNX
+VPX_CONF += --disable-runtime-cpu-detect
+endif
+
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
-	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
+	cd $< && CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) LDFLAGS="$(VPX_LDFLAGS)" ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
 	cd $< && $(MAKE)
 	$(call pkg_static,"vpx.pc")
