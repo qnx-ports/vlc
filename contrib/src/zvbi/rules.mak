@@ -26,6 +26,10 @@ endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/zvbi/zvbi-android.patch
 endif
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/zvbi/0001-qnx-fix-syslog-include.patch
+endif
+	$(APPLY) $(SRC)/zvbi/0001-Use-standard-va_copy-not-GNU-__va_copy.patch
 	$(MOVE)
 
 DEPS_zvbi = png $(DEPS_png) iconv $(DEPS_iconv)

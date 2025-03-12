@@ -1,0 +1,11 @@
+--- a/src/proxy-msg.h	2025-02-06 14:52:47.352557314 -0500
++++ b/src/proxy-msg.h	2025-02-06 14:53:04.495731175 -0500
+@@ -68,7 +68,7 @@
+ #ifndef PROXY_MSG_H
+ #define PROXY_MSG_H
+ 
+-#include <sys/syslog.h>
++#include <syslog.h>
+ 
+ /* Public */
+ 
