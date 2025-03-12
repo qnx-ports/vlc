@@ -198,9 +198,11 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
                           + messages->verticalScrollBar()->pageStep()
                           >= messages->verticalScrollBar()->maximum() );
 
+#ifdef HAVE_QT_CLIPBOARD
     /* Copy selected text to the clipboard */
     if( messages->textCursor().hasSelection() )
         messages->copy();
+#endif
 
     /* Fix selected text bug */
     if( !messages->textCursor().atEnd() ||

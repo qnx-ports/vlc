@@ -3796,6 +3796,24 @@ AM_CONDITIONAL(ENABLE_QT, [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
 
 dnl
+dnl See if QT supports clipboard
+dnl
+AS_IF([test "${enable_qt}" != "no"], [
+  AC_MSG_CHECKING([for clipboard support in QT])
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[#include <QtGui/qclipboard.h>
+      #ifdef QT_NO_CLIPBOARD
+      #error QT does not support clipboard
+      #endif
+    ]], [[;]])], [
+      AC_DEFINE([HAVE_QT_CLIPBOARD], [1], [Define to 1 if QT supports clipboard.])
+      AC_MSG_RESULT([yes])
+    ], [
+      AC_MSG_RESULT([no])
+    ])
+])
+
+dnl
 dnl detect kde4-config patch (used for kde solids).
 dnl
 AC_ARG_VAR([KDE4_CONFIG], [kde4-config utility])

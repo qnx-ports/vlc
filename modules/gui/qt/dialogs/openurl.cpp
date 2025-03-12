@@ -68,9 +68,11 @@ OpenUrlDialog::OpenUrlDialog( intf_thread_t *_p_intf,
                                     "to the media you want to play."),
                                this );
 
+#ifdef HAVE_QT_CLIPBOARD
     setToolTip( qtr( "If your clipboard contains a valid URL\n"
                      "or the path to a file on your computer,\n"
                      "it will be automatically selected." ) );
+#endif
 
     /* Layout */
     QVBoxLayout *vlay = new QVBoxLayout( this );
@@ -122,6 +124,7 @@ void OpenUrlDialog::showEvent( QShowEvent* )
     else
         edit->clear();
 
+#ifdef HAVE_QT_CLIPBOARD
     if( bClipboard )
     {
         QClipboard *clipboard = QApplication::clipboard();
@@ -134,4 +137,5 @@ void OpenUrlDialog::showEvent( QShowEvent* )
         if( txt.contains( "://" ) || QFile::exists( txt ) )
             edit->setText( txt );
     }
+#endif
 }
