@@ -14,7 +14,7 @@ OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
 libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
-libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) -lpthread
+libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) $(LIBPTHREAD)
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
