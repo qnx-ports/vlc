@@ -183,6 +183,9 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
             break;
         }
 #endif
+        case VOUT_WINDOW_TYPE_QNX:
+            p_wnd->handle.scrWin = (void *)stable->winId();
+            break;
         default:
             vlc_assert_unreachable();
     }

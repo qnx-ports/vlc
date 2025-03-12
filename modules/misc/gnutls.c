@@ -110,6 +110,8 @@ static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
 {
 #ifdef IOV_MAX
     const long iovmax = IOV_MAX;
+#elif defined(UIO_MAXIOV)
+    const long iovmax = UIO_MAXIOV;
 #else
     const long iovmax = sysconf(_SC_IOV_MAX);
 #endif

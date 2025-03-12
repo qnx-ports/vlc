@@ -415,6 +415,17 @@ vout_LTLIBRARIES += libegl_android_plugin.la libglconv_android_plugin.la
 endif
 endif
 
+### QNX ###
+
+libegl_qnx_plugin_la_SOURCES = video_output/opengl/egl.c
+libegl_qnx_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_QNX=1
+libegl_qnx_plugin_la_LIBADD = $(EGL_LIBS) -lGLESv2
+
+if HAVE_QNX
+if HAVE_EGL
+vout_LTLIBRARIES += libegl_qnx_plugin.la
+endif
+endif
 
 ### FrameBuffer ###
 

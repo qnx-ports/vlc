@@ -64,6 +64,20 @@
  #endif
 #endif
 
+#ifdef __QNXNTO__
+ #include <QtPlugin>
+
+ #ifdef QT_STATICPLUGIN
+  Q_IMPORT_PLUGIN(QQnxIntegrationPlugin)
+  Q_IMPORT_PLUGIN(QSvgIconPlugin)
+  Q_IMPORT_PLUGIN(QSvgPlugin)
+
+  #if !HAS_QT56
+   Q_IMPORT_PLUGIN(AccessibleFactory)
+  #endif
+ #endif
+#endif
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -606,6 +620,8 @@ static void *ThreadPlatform( void *obj, char *platform_name )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
         else if( platform == qfu("cocoa" ) )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+        else if( platform == qfu("qnx" ) )
+            p_sys->voutWindowType = VOUT_WINDOW_TYPE_QNX;
         else
             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
 

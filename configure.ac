@@ -304,6 +304,8 @@ case "${host_os}" in
     ;;
   *nto*)
     SYS=nto
+    AC_SEARCH_LIBS(recvmsg, [socket])
+    AC_SEARCH_LIBS(sendmsg, [socket])
     ;;
   solaris*)
     SYS=solaris
@@ -426,6 +428,9 @@ AS_IF([test "$SYS" = linux],[
     ])
 ])
 AM_CONDITIONAL(HAVE_TIZEN, test "${HAVE_TIZEN}" = "1")
+
+dnl QNX SDP8.0
+AM_CONDITIONAL(HAVE_QNX, test "${SYS}" = "nto")
 
 dnl
 dnl  Check for the contrib directory

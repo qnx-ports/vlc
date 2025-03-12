@@ -176,6 +176,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
 #ifdef IOV_MAX
     const long iovmax = IOV_MAX;
+#elif defined(UIO_MAXIOV)
+    const long iovmax = UIO_MAXIOV;
 #else
     const long iovmax = sysconf(_SC_IOV_MAX);
 #endif

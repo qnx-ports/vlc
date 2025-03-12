@@ -42,6 +42,9 @@
 #if defined (USE_PLATFORM_ANDROID)
 # include "../android/utils.h"
 #endif
+#if defined (USE_PLATFORM_QNX)
+# include <screen/screen.h>
+#endif
 
 typedef struct vlc_gl_sys_t
 {
@@ -56,9 +59,15 @@ typedef struct vlc_gl_sys_t
     struct wl_egl_window *window;
     unsigned width, height;
 #endif
+#if defined (USE_PLATFORM_QNX)
+    screen_window_t window;
+    EGLConfig cfg;
+#endif
     PFNEGLCREATEIMAGEKHRPROC    eglCreateImageKHR;
     PFNEGLDESTROYIMAGEKHRPROC   eglDestroyImageKHR;
 } vlc_gl_sys_t;
+
+static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config, void *window, const EGLint *attrs);
 
 static int MakeCurrent (vlc_gl_t *gl)
 {
@@ -89,6 +98,56 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
     sys->width = width;
     sys->height = height;
 }
+
+#elif defined(USE_PLATFORM_QNX)
+static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+    int dims[2] = {0, 0};
+    int buf_dims[2] = {0, 0};
+    EGLint surf_dims[2] = {0, 0};
+    int make_surface = 0;
+    int make_buffers;
+
+    /* The width/height passed into this function represent the width/height of the
+     * (scaled) video image on the display. NOT the surface that image is rendered to.
+     * Query to get the current size of the underlying window and use that instead
+     * as that seems to be the actual size of the entire window (video + letterboxing)
+     * that is supposed to be visible.
+     */
+    (void)width;
+    (void)height;
+    screen_get_window_property_iv(sys->window, SCREEN_PROPERTY_SIZE, dims);
+
+    /* Figure out if the window's buffers actually need a resize */
+    screen_get_window_property_iv(sys->window, SCREEN_PROPERTY_BUFFER_SIZE, buf_dims);
+    make_buffers = dims[0] != buf_dims[0] || dims[1] != buf_dims[1];
+
+    /* If there already is a surface, see if it needs to be changed */
+    if (sys->surface != EGL_NO_SURFACE) {
+        eglQuerySurface(sys->display, sys->surface, EGL_WIDTH, &surf_dims[0]);
+        eglQuerySurface(sys->display, sys->surface, EGL_HEIGHT, &surf_dims[1]);
+
+        if (make_buffers || dims[0] != surf_dims[0] || dims[1] != surf_dims[1]) {
+            eglDestroySurface(sys->display, sys->surface);
+            sys->surface = EGL_NO_SURFACE;
+            make_surface = 1;
+        }
+    }
+
+    /* Recreate the screen buffers if required */
+    if (make_buffers) {
+        screen_destroy_window_buffers(sys->window);
+        screen_set_window_property_iv(sys->window, SCREEN_PROPERTY_BUFFER_SIZE, dims);
+        screen_create_window_buffers(sys->window, 2);
+    }
+
+    /* Re-create the surface (if required) */
+    if (make_surface) {
+        sys->surface = CreateWindowSurface(sys->display, sys->cfg, &sys->window, NULL);
+    }
+}
+
 #else
 # define Resize (NULL)
 #endif
@@ -347,6 +406,30 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 # endif
 
+#elif defined (USE_PLATFORM_QNX)
+    if (wnd->type != VOUT_WINDOW_TYPE_QNX)
+        goto error;
+    window = &wnd->handle.scrWin;
+
+    /* Make sure that the window supports GLES2 */
+    int iprop;
+    if (screen_get_window_property_iv(wnd->handle.scrWin, SCREEN_PROPERTY_USAGE, &iprop))
+        goto error;
+    iprop |= SCREEN_USAGE_OPENGL_ES2;
+    if (screen_set_window_property_iv(wnd->handle.scrWin, SCREEN_PROPERTY_USAGE, &iprop))
+        goto error;
+
+    /* Change transparency as QT sets it to DISCARD which makes it permanently invisible */
+    if (screen_get_window_property_iv(wnd->handle.scrWin, SCREEN_PROPERTY_TRANSPARENCY, &iprop))
+        goto error;
+    if (iprop == SCREEN_TRANSPARENCY_DISCARD) {
+        iprop = SCREEN_TRANSPARENCY_NONE;
+        if (screen_set_window_property_iv(wnd->handle.scrWin, SCREEN_PROPERTY_TRANSPARENCY, &iprop))
+            goto error;
+    }
+
+    sys->window = wnd->handle.scrWin;
+    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 #endif
 
     if (sys->display == EGL_NO_DISPLAY)
@@ -387,6 +470,9 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
         msg_Err (obj, "cannot choose EGL configuration");
         goto error;
     }
+#if defined (USE_PLATFORM_QNX)
+    sys->cfg = cfgv[0];
+#endif
 
     /* Create a drawing surface */
     sys->surface = createSurface(sys->display, cfgv[0], window, NULL);
