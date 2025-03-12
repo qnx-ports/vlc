@@ -3001,7 +3001,6 @@ AS_IF( [test "${enable_libass}" != "no"], [
 
         AC_CHECK_HEADERS(fontconfig/fontconfig.h,
           [VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
-           VLC_ADD_LIBS([libass],[-lfontconfig])
        ])
       ],[
         AC_MSG_WARN([${LIBASS_PKG_ERRORS}.])
