@@ -593,6 +593,26 @@ void vlc_cancel(vlc_thread_t th)
 int vlc_savecancel (void)
 {
     int state;
+
+#if defined(__QNXNTO__)
+    /* If there is a pending cancellation while the cancel state was disabled,
+     * it will fire when cancel state is enabled and the next cancellation point
+     * is hit. However what should happen if the cancel state is again disabled
+     * before a cancellation point is hit? POSIX is unclear on this point.
+     *
+     * On Linux, it appears that the cancellation request goes back to being pending.
+     *
+     * On QNX, it will still fire at the next cancellation point. This is arguably
+     * a bug and may be fixed in the future.
+     *
+     * Since the code is assuming Linux behaviour, make a pending cancellation
+     * fire now. I have to do it before the cancelstate is set as pthread_testcancel
+     * does nothing once the cancelstate is disabled. Thus if the cancelstate is
+     * already disabled this does nothing (as it should).
+     */
+    pthread_testcancel();
+#endif
+
     int val = pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
 
     VLC_THREAD_ASSERT ("saving cancellation");
