@@ -1,0 +1,10 @@
+--- a/source/CMakeLists.txt	2025-02-13 16:56:11.394500065 -0500
++++ b/source/CMakeLists.txt	2025-02-13 16:56:56.735985017 -0500
+@@ -658,6 +658,7 @@
+         list(REMOVE_ITEM PLIBLIST "-lc" "-lpthread" "-lmingwex" "-lmingwthrd"
+             "-lmingw32" "-lmoldname" "-lmsvcrt" "-ladvapi32" "-lshell32"
+             "-luser32" "-lkernel32")
++        list(REMOVE_ITEM PLIBLIST "-lcS")
+         string(REPLACE ";" " " PRIVATE_LIBS "${PLIBLIST}")
+     else()
+         set(PRIVATE_LIBS "")

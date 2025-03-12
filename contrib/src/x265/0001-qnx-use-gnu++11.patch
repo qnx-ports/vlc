@@ -1,0 +1,11 @@
+--- a/source/CMakeLists.txt	2025-02-07 14:02:19.027990139 -0500
++++ b/source/CMakeLists.txt	2025-02-07 14:02:32.375095280 -0500
+@@ -206,7 +206,7 @@
+         endif()
+         add_definitions(-std=gnu++11)
+     else()
+-        add_definitions(-std=gnu++98)
++        add_definitions(-std=gnu++11)
+     endif()
+     if(ENABLE_PIC)
+          add_definitions(-fPIC)

@@ -1,0 +1,22 @@
+--- a/source/CMakeLists.txt	2025-03-13 13:25:30.041561751 -0400
++++ b/source/CMakeLists.txt	2025-03-13 13:58:41.424514646 -0400
+@@ -325,7 +325,18 @@
+             endif()
+         endif()
+     endif(ENABLE_AGGRESSIVE_CHECKS)
+-    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CC_VERSION)
++    if (CMAKE_SYSTEM_NAME STREQUAL QNX)
++        execute_process(COMMAND ${CMAKE_CXX_COMPILER} -V OUTPUT_VARIABLE CC_VERSION ERROR_VARIABLE CC_VERSION)
++        # Output will be a bit of preamble on the 1st line, the subsequent lines
++        # each giving a target and version. Assume that the version is the same
++        # for each target.
++        string(REPLACE "\n" ";" CC_VERSION "${CC_VERSION}")
++        list(GET CC_VERSION 1 CC_VERSION)
++        string(STRIP "${CC_VERSION}" CC_VERSION)
++        string(REGEX MATCH "^[0-9.]*" CC_VERSION "${CC_VERSION}")
++    else()
++        execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CC_VERSION)
++    endif()
+ endif(GCC)
+ 
+ find_package(Nasm)
