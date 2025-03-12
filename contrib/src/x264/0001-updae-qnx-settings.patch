@@ -1,0 +1,42 @@
+--- a/configure	2025-02-07 13:56:19.290151855 -0500
++++ b/configure	2025-02-07 13:56:27.901219925 -0500
+@@ -689,8 +689,6 @@
+         SYS="QNX"
+         define HAVE_MALLOC_H
+         libm="-lm"
+-        HAVE_GETOPT_LONG=0
+-        CFLAGS="$CFLAGS -I\$(SRCPATH)/extras"
+         ;;
+     *haiku*)
+         SYS="HAIKU"
+--- a/configure	2025-03-07 14:12:21.498210950 -0500
++++ b/configure	2025-03-07 14:30:59.709408949 -0500
+@@ -1388,6 +1388,10 @@
+         CFLAGS="-DNDEBUG $CFLAGS"
+     fi
+ else # gcc/icc
++    if [[ "$host_os" = nto-qnx* && "${cc_base%% *}" = qcc ]]; then
++        DEPMM="-E -Wp,-MM"
++        DEPMT="-Wp,-MT"
++    fi
+     DEPMM="$DEPMM -g0"
+     AR="$AR rc "
+     LD="$CC -o "
+--- a/Makefile	2025-03-07 14:35:49.980416684 -0500
++++ b/Makefile	2025-03-07 14:36:13.455660514 -0500
+@@ -324,12 +324,12 @@
+ 	@$(foreach SRC, $(addprefix $(SRCPATH)/, $(SRCS_X) $(SRCCLI_X) $(SRCCHK_X)), $(SRCPATH)/tools/msvsdepend.sh "$(CC)" "$(CFLAGS)" "$(SRC)" "$(SRC:$(SRCPATH)/%.c=%-10.o)" 1>> .depend;)
+ endif
+ else
+-	@$(foreach SRC, $(addprefix $(SRCPATH)/, $(SRCS) $(SRCCLI) $(SRCSO) $(SRCEXAMPLE)), $(CC) $(CFLAGS) $(SRC) $(DEPMT) $(SRC:$(SRCPATH)/%.c=%.o) $(DEPMM) 1>> .depend;)
++	@$(foreach SRC, $(addprefix $(SRCPATH)/, $(SRCS) $(SRCCLI) $(SRCSO) $(SRCEXAMPLE)), $(CC) $(CFLAGS) $(SRC) $(DEPMT)$(SRC:$(SRCPATH)/%.c=%.o) $(DEPMM) 1>> .depend;)
+ ifneq ($(findstring HAVE_BITDEPTH8 1, $(CONFIG)),)
+-	@$(foreach SRC, $(addprefix $(SRCPATH)/, $(SRCS_X) $(SRCS_8) $(SRCCLI_X) $(SRCCHK_X)), $(CC) $(CFLAGS) $(SRC) $(DEPMT) $(SRC:$(SRCPATH)/%.c=%-8.o) $(DEPMM) 1>> .depend;)
++	@$(foreach SRC, $(addprefix $(SRCPATH)/, $(SRCS_X) $(SRCS_8) $(SRCCLI_X) $(SRCCHK_X)), $(CC) $(CFLAGS) $(SRC) $(DEPMT)$(SRC:$(SRCPATH)/%.c=%-8.o) $(DEPMM) 1>> .depend;)
+ endif
+ ifneq ($(findstring HAVE_BITDEPTH10 1, $(CONFIG)),)
+-	@$(foreach SRC, $(addprefix $(SRCPATH)/, $(SRCS_X) $(SRCCLI_X) $(SRCCHK_X)), $(CC) $(CFLAGS) $(SRC) $(DEPMT) $(SRC:$(SRCPATH)/%.c=%-10.o) $(DEPMM) 1>> .depend;)
++	@$(foreach SRC, $(addprefix $(SRCPATH)/, $(SRCS_X) $(SRCCLI_X) $(SRCCHK_X)), $(CC) $(CFLAGS) $(SRC) $(DEPMT)$(SRC:$(SRCPATH)/%.c=%-10.o) $(DEPMM) 1>> .depend;)
+ endif
+ endif
+ 

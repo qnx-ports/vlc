@@ -96,6 +96,9 @@ x264 x26410b: %: x264-git.tar.bz2 .sum-%
 	mkdir -p $*-git
 	tar xvjfo "$<" --strip-components=1 -C $*-git
 	$(UPDATE_AUTOCONFIG)
+ifdef HAVE_QNX
+	$(APPLY) $(SRC)/x264/0001-updae-qnx-settings.patch
+endif
 	mv $*-git $*
 
 x262: x262-git.tar.gz .sum-x262
