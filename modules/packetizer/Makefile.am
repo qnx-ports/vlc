@@ -35,6 +35,7 @@ libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
 	codec/avcodec/avcodec.h
 libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(AM_CFLAGS)
 libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM) libavcodec_common.la
+libpacketizer_avparser_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 
 noinst_HEADERS += packetizer/packetizer_helper.h packetizer/startcode_helper.h
 
