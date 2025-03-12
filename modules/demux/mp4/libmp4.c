@@ -1476,8 +1476,7 @@ static int MP4_ReadBox_url( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"url\" url: %s",
-                       p_box->data.p_url->psz_location );
-
+                       p_box->data.p_url->psz_location ? p_box->data.p_url->psz_location : "<null>" );
 #endif
     MP4_READBOX_EXIT( 1 );
 }
@@ -1499,8 +1498,8 @@ static int MP4_ReadBox_urn( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"urn\" name %s location %s",
-                      p_box->data.p_urn->psz_name,
-                      p_box->data.p_urn->psz_location );
+                      p_box->data.p_urn->psz_name ? p_box->data.p_urn->psz_name : "<null>",
+                      p_box->data.p_urn->psz_location ? p_box->data.p_urn->psz_location : "<null>" );
 #endif
     MP4_READBOX_EXIT( 1 );
 }
@@ -3403,7 +3402,7 @@ static int MP4_ReadBox_cprt( stream_t *p_stream, MP4_Box_t *p_box )
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"cprt\" language %3.3s notice %s",
                       p_box->data.p_cprt->rgs_language,
-                      p_box->data.p_cprt->psz_notice );
+                      p_box->data.p_cprt->psz_notice ? p_box->data.p_cprt->psz_notice : "<null>" );
 
 #endif
     MP4_READBOX_EXIT( 1 );

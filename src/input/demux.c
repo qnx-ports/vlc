@@ -232,7 +232,8 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         msg_Dbg( p_obj, "creating demux: access='%s' demux='%s' "
                  "location='%s' file='%s'",
                  p_demux->psz_access, p_demux->psz_demux,
-                 p_demux->psz_location, p_demux->psz_file );
+                 p_demux->psz_location,
+                 p_demux->psz_file ? p_demux->psz_file : "" );
 
     p_demux->s              = s;
     p_demux->out            = out;
