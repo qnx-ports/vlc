@@ -48,7 +48,7 @@
 
 #include "../../packetizer/av1_obu.h"
 #include "../../packetizer/av1.h"
-#include "../codec/cc.h"
+#include "../cc.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor

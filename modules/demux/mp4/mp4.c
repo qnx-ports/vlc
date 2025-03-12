@@ -36,7 +36,7 @@
 #include <vlc_dialog.h>
 #include <assert.h>
 #include <limits.h>
-#include "../codec/cc.h"
+#include "../../codec/cc.h"
 #include "../av1_unpack.h"
 
 /*****************************************************************************

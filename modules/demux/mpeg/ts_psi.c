@@ -55,7 +55,7 @@
 #include "ts_si.h"
 #include "ts_metadata.h"
 
-#include "../access/dtv/en50221_capmt.h"
+#include "../../access/dtv/en50221_capmt.h"
 
 #include <assert.h>
 

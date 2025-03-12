@@ -34,7 +34,7 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include "substext.h"
+#include "../substext.h"
 #include "ttml.h"
 
 //#define TTML_DEBUG

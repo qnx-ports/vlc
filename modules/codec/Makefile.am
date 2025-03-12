@@ -1,7 +1,7 @@
 codecdir = $(pluginsdir)/codec
 codec_LTLIBRARIES =
 
-AM_CPPFLAGS += -I$(srcdir)/codec
+CODEC_CPPFLAGS = ${AM_CPPFLAGS} -I$(srcdir)/codec
 
 libddummy_plugin_la_SOURCES = codec/ddummy.c
 codec_LTLIBRARIES += libddummy_plugin.la
@@ -17,14 +17,14 @@ libspdif_plugin_la_SOURCES = codec/spdif.c
 codec_LTLIBRARIES += libspdif_plugin.la
 
 liba52_plugin_la_SOURCES = codec/a52.c
-liba52_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_a52)
+liba52_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) $(CPPFLAGS_a52)
 liba52_plugin_la_LIBADD = $(LIBS_a52)
 liba52_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 EXTRA_LTLIBRARIES += liba52_plugin.la
 codec_LTLIBRARIES += $(LTLIBa52)
 
 libdca_plugin_la_SOURCES = codec/dca.c
-libdca_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DCA_CFLAGS)
+libdca_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) $(DCA_CFLAGS)
 libdca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libdca_plugin_la_LIBADD = $(LIBM) $(DCA_LIBS)
 EXTRA_LTLIBRARIES += libdca_plugin.la
@@ -41,7 +41,7 @@ libaraw_plugin_la_LIBADD = $(LIBM)
 codec_LTLIBRARIES += libaraw_plugin.la
 
 libfaad_plugin_la_SOURCES = codec/faad.c packetizer/mpeg4audio.h
-libfaad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_faad)
+libfaad_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) $(CPPFLAGS_faad)
 libfaad_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libfaad_plugin_la_LIBADD = $(LIBS_faad) $(LIBM)
 EXTRA_LTLIBRARIES += libfaad_plugin.la
@@ -73,7 +73,7 @@ liblpcm_plugin_la_SOURCES = codec/lpcm.c
 codec_LTLIBRARIES += liblpcm_plugin.la
 
 libmad_plugin_la_SOURCES = codec/mad.c
-libmad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(MAD_CFLAGS)
+libmad_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) $(MAD_CFLAGS)
 libmad_plugin_la_LIBADD = $(AM_LIBADD) $(MAD_LIBS)
 if HAVE_MAD
 audio_filter_LTLIBRARIES += libmad_plugin.la
@@ -97,7 +97,7 @@ libwma_fixed_plugin_la_SOURCES = \
 	codec/wmafixed/bitstream.c codec/wmafixed/bitstream.h \
 	codec/wmafixed/wmadata.h codec/wmafixed/wmadec.h \
 	codec/wmafixed/wmafixed.c codec/wmafixed/wmafixed.h
-libwma_fixed_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libwma_fixed_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS)
 libwma_fixed_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 EXTRA_LTLIBRARIES += libwma_fixed_plugin.la
 codec_LTLIBRARIES += $(LTLIBwma_fixed)
@@ -179,7 +179,7 @@ endif
 ### SPU ###
 
 liblibass_plugin_la_SOURCES = codec/libass.c
-liblibass_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_libass)
+liblibass_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) $(CPPFLAGS_libass)
 liblibass_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBASS_CFLAGS)
 liblibass_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 liblibass_plugin_la_LIBADD = $(LIBASS_LIBS) $(LIBS_libass) $(LIBS_freetype) $(FREETYPE_LIBS)
@@ -214,7 +214,7 @@ libscte27_plugin_la_SOURCES = codec/scte27.c
 codec_LTLIBRARIES += libscte27_plugin.la
 
 libspudec_plugin_la_SOURCES = codec/spudec/spudec.c codec/spudec/parse.c codec/spudec/spudec.h
-libspudec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libspudec_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS)
 codec_LTLIBRARIES += libspudec_plugin.la
 
 libstl_plugin_la_SOURCES = codec/stl.c
@@ -322,7 +322,7 @@ EXTRA_LTLIBRARIES += libdaala_plugin.la
 codec_LTLIBRARIES += $(LTLIBdaala)
 
 libtremor_plugin_la_SOURCES = codec/vorbis.c
-libtremor_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_tremor
+libtremor_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -DMODULE_NAME_IS_tremor
 libtremor_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libtremor_plugin_la_LIBADD = -lvorbisdec -logg
 EXTRA_LTLIBRARIES += libtremor_plugin.la
@@ -408,13 +408,13 @@ endif
 
 libvaapi_drm_plugin_la_SOURCES = \
 	codec/avcodec/vaapi.c hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
-libvaapi_drm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_VA_BACKEND_DRM
+libvaapi_drm_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -DVLC_VA_BACKEND_DRM
 libvaapi_drm_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(LIBVA_DRM_CFLAGS) $(AVCODEC_CFLAGS)
 libvaapi_drm_plugin_la_LIBADD = $(LIBVA_DRM_LIBS)
 libvaapi_plugin_la_SOURCES = \
 	codec/avcodec/vaapi.c hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
-libvaapi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libvaapi_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS)
 libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
 libvaapi_plugin_la_LIBADD = $(LIBVA_LIBS)
 if HAVE_AVCODEC_VAAPI
@@ -487,12 +487,12 @@ if HAVE_ANDROID
 libomxil_plugin_la_SOURCES += video_output/android/utils.c video_output/android/utils.h \
 	video_output/android/display.h
 endif
-libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil)
+libomxil_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil)
 libomxil_plugin_la_LIBADD = libchroma_copy.la $(LIBDL)
 libomxil_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 
 libomxil_vout_plugin_la_SOURCES = codec/omxil/vout.c codec/omxil/omxil_core.c codec/omxil/utils.c codec/omxil/qcom.c
-libomxil_vout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil_vout)
+libomxil_vout_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil_vout)
 libomxil_vout_plugin_la_LIBADD = libchroma_copy.la $(LIBDL)
 libomxil_vout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 
@@ -500,7 +500,7 @@ libiomx_plugin_la_SOURCES = $(libomxil_plugin_la_SOURCES)
 libiomx_plugin_la_CPPFLAGS = $(libomxil_plugin_la_CPPFLAGS) -DUSE_IOMX
 libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 
-libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
+libmediacodec_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
 	codec/omxil/mediacodec_jni.c codec/omxil/mediacodec_ndk.c codec/omxil/utils.c \
 	video_output/android/utils.c video_output/android/utils.h \
@@ -520,7 +520,7 @@ endif
 ### X26x encoders ###
 
 libx265_plugin_la_SOURCES = codec/x265.c
-libx265_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libx265_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS)
 libx265_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_x265)
 libx265_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_x265) -rpath '$(codecdir)'
 libx265_plugin_la_LIBADD = $(LIBS_x265)
@@ -528,7 +528,7 @@ EXTRA_LTLIBRARIES += libx265_plugin.la
 codec_LTLIBRARIES += $(LTLIBx265)
 
 libx262_plugin_la_SOURCES = codec/x264.c
-libx262_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_x262
+libx262_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -DMODULE_NAME_IS_x262
 libx262_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_x262)
 libx262_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_x262) -rpath '$(codecdir)'
 libx262_plugin_la_LIBADD = $(LIBS_x262) $(LIBM)
@@ -536,7 +536,7 @@ EXTRA_LTLIBRARIES += libx262_plugin.la
 codec_LTLIBRARIES += $(LTLIBx262)
 
 libx264_plugin_la_SOURCES = codec/x264.c
-libx264_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_x264) -DMODULE_NAME_IS_x264
+libx264_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) $(CPPFLAGS_x264) -DMODULE_NAME_IS_x264
 libx264_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_x264)
 libx264_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_x264) -rpath '$(codecdir)'
 libx264_plugin_la_LIBADD = $(LIBS_x264) $(LIBM)
@@ -544,7 +544,7 @@ EXTRA_LTLIBRARIES += libx264_plugin.la
 codec_LTLIBRARIES += $(LTLIBx264)
 
 libx26410b_plugin_la_SOURCES = codec/x264.c
-libx26410b_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_x26410b
+libx26410b_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -DMODULE_NAME_IS_x26410b
 libx26410b_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_x26410b)
 libx26410b_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_x26410b) -rpath '$(codecdir)'
 libx26410b_plugin_la_LIBADD = $(LIBS_x26410b) $(LIBM)
@@ -568,7 +568,7 @@ EXTRA_LTLIBRARIES += libshine_plugin.la
 codec_LTLIBRARIES += $(LTLIBshine)
 
 libvpx_plugin_la_SOURCES = codec/vpx.c
-libvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libvpx_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS)
 libvpx_plugin_la_CFLAGS = $(AM_CFLAGS) $(VPX_CFLAGS) $(CPPFLAGS_vpx)
 libvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libvpx_plugin_la_LIBADD = $(VPX_LIBS)
@@ -577,7 +577,7 @@ codec_LTLIBRARIES += $(LTLIBvpx)
 
 libaom_plugin_la_SOURCES = codec/aom.c \
                            packetizer/iso_color_tables.h
-libaom_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libaom_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS)
 libaom_plugin_la_CFLAGS = $(AM_CFLAGS) $(AOM_CFLAGS) $(CPPFLAGS_aom)
 libaom_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libaom_plugin_la_LIBADD = $(AOM_LIBS) $(LIBPTHREAD)
@@ -585,7 +585,7 @@ EXTRA_LTLIBRARIES += libaom_plugin.la
 codec_LTLIBRARIES += $(LTLIBaom)
 
 libtwolame_plugin_la_SOURCES = codec/twolame.c
-libtwolame_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DLIBTWOLAME_STATIC
+libtwolame_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) -DLIBTWOLAME_STATIC
 libtwolame_plugin_la_CFLAGS = $(AM_CFLAGS) $(TWOLAME_CFLAGS)
 libtwolame_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libtwolame_plugin_la_LIBADD = $(TWOLAME_LIBS) $(LIBM)
@@ -593,7 +593,7 @@ EXTRA_LTLIBRARIES += libtwolame_plugin.la
 codec_LTLIBRARIES += $(LTLIBtwolame)
 
 libdav1d_plugin_la_SOURCES = codec/dav1d.c
-libdav1d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DAV1D_CFLAGS)
+libdav1d_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS) $(DAV1D_CFLAGS)
 libdav1d_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdav1d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libdav1d_plugin_la_LIBADD = $(DAV1D_LIBS)
@@ -620,7 +620,7 @@ codec_LTLIBRARIES += $(LTLIBqsv)
 ### External frameworks ###
 
 libdmo_plugin_la_SOURCES = codec/dmo/dmo.c codec/dmo/dmo.h codec/dmo/buffer.c
-libqsv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libqsv_plugin_la_CPPFLAGS = $(CODEC_CPPFLAGS)
 libdmo_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32
 libdmo_plugin_la_LIBADD += $(LIBCOM) -luuid

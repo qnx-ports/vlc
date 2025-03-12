@@ -1,7 +1,7 @@
 accessdir = $(pluginsdir)/access
 access_LTLIBRARIES =
 
-AM_CPPFLAGS += -I$(srcdir)/access
+ACCESS_CPPFLAGS = ${AM_CPPFLAGS} -I$(srcdir)/access
 
 ### Files ###
 
@@ -10,7 +10,7 @@ access_LTLIBRARIES += libattachment_plugin.la
 
 libdcp_plugin_la_SOURCES = access/dcp/dcpparser.h access/dcp/dcp.cpp access/dcp/dcpparser.cpp access/dcp/dcpdecrypt.cpp
 if HAVE_ASDCP
-libdcp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(ASDCP_CFLAGS)
+libdcp_plugin_la_CPPFLAGS = $(ACCESS_CPPFLAGS) $(ASDCP_CFLAGS)
 libdcp_plugin_la_LIBADD = $(AM_LIBADD) $(ASDCP_LIBS)
 if HAVE_GCRYPT
 libdcp_plugin_la_CPPFLAGS += $(GCRYPT_CFLAGS)
@@ -20,7 +20,7 @@ endif
 endif
 
 libfilesystem_plugin_la_SOURCES = access/fs.h access/file.c access/directory.c access/fs.c
-libfilesystem_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libfilesystem_plugin_la_CPPFLAGS = $(ACCESS_CPPFLAGS)
 if HAVE_WIN32
 libfilesystem_plugin_la_LIBADD = -lshlwapi
 endif
@@ -150,7 +150,7 @@ libv4l2_plugin_la_SOURCES = \
 	access/v4l2/controls.c \
 	access/v4l2/lib.c \
 	access/v4l2/v4l2.h
-libv4l2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/v4l2
+libv4l2_plugin_la_CPPFLAGS = $(ACCESS_CPPFLAGS) -I$(srcdir)/access/v4l2
 libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS) $(ZVBI_CFLAGS)
 libv4l2_plugin_la_LIBADD = $(LIBDL) $(LIBM) $(ZVBI_LIBS) $(LIBPTHREAD)
 if HAVE_V4L2
@@ -392,7 +392,7 @@ libaccess_realrtsp_plugin_la_SOURCES = \
 	access/rtsp/real_rmff.c access/rtsp/real_rmff.h \
 	access/rtsp/real_sdpplin.c access/rtsp/real_sdpplin.h \
 	access/rtsp/real_asmrp.c
-libaccess_realrtsp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libaccess_realrtsp_plugin_la_CPPFLAGS = $(ACCESS_CPPFLAGS)
 libaccess_realrtsp_plugin_la_LIBADD = $(SOCKET_LIBS)
 libaccess_realrtsp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_realrtsp)
@@ -428,7 +428,7 @@ EXTRA_LTLIBRARIES += libaccess_mtp_plugin.la
 
 libaccess_srt_plugin_la_SOURCES = access/srt.c access/srt_common.c access/srt_common.h dummy.cpp
 libaccess_srt_plugin_la_CFLAGS = $(AM_CFLAGS) $(SRT_CFLAGS)
-libaccess_srt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SRT_CPPFLAGS)
+libaccess_srt_plugin_la_CPPFLAGS = $(ACCESS_CPPFLAGS) $(SRT_CPPFLAGS)
 libaccess_srt_plugin_la_LIBADD = $(SRT_LIBS)
 libaccess_srt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_srt)

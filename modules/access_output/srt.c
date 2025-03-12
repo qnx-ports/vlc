@@ -22,7 +22,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <srt_common.h>
+#include "../access/srt_common.h"
 
 #include <vlc_interrupt.h>
 #include <vlc_fs.h>
