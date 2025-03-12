@@ -666,6 +666,10 @@ FILE *vlc_win32_tmpfile(void);
 # define IN6_IS_ADDR_MULTICAST IN6_IS_ADDR_MULTICAST
 #endif
 
+#if !defined(HAVE_STRERROR_L)
+char *strerror_l(int errnum, locale_t locale);
+#endif
+
 #ifdef __APPLE__
 # define fdatasync fsync
 #endif
