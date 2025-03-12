@@ -31,26 +31,36 @@
 
 static const char *vlc_strerror_l(int errnum, const char *lname)
 {
+    const char *buf = NULL;
     int saved_errno = errno;
     locale_t loc = newlocale(LC_MESSAGES_MASK, lname, (locale_t)0);
 
-    if (unlikely(loc == (locale_t)0))
+    if (likely(loc != (locale_t)0))
+    {
+        buf = strerror_l(errnum, loc);
+    }
+    else
     {
         if (errno == ENOENT) /* fallback to POSIX locale */
             loc = newlocale(LC_MESSAGES_MASK, "C", (locale_t)0);
 
-        if (unlikely(loc == (locale_t)0))
+        if (likely(loc != (locale_t)0))
         {
-            assert(errno != EINVAL && errno != ENOENT);
-            errno = saved_errno;
-            return "Error message unavailable";
+            buf = strerror_l(errnum, loc);
         }
-        errno = saved_errno;
+        else if (errno == ENOENT)
+        {
+            buf = strerror(errnum);
+        }
+        else
+        {
+            assert(errno != EINVAL);
+            buf = "Error message unavailable";
+        }
     }
 
-    const char *buf = strerror_l(errnum, loc);
-
     freelocale(loc);
+    errno = saved_errno;
     return buf;
 }
 
