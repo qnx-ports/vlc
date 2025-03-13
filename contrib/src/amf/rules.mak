@@ -12,7 +12,9 @@ PKGS += amf
 endif
 ifdef HAVE_LINUX
 ifndef HAVE_ANDROID
+ifndef HAVE_QNX
 PKGS += amf
+endif
 endif
 endif
 endif
