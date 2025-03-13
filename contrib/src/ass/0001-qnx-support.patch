@@ -1,0 +1,22 @@
+--- a/configure	2025-03-13 13:26:22.470253203 +0000
++++ b/configure	2025-03-13 13:26:48.212626798 +0000
+@@ -14931,7 +14931,7 @@
+ 
+ fi
+                  ;; #(
+-  *linux*|*solaris*|*haiku*|*-gnu*) :
++  *linux*|*solaris*|*haiku*|*-gnu*|*-nto-qnx*) :
+ 
+                     ASFLAGS="$ASFLAGS -f elf$BITTYPE -DSTACK_ALIGNMENT=16"
+                  ;; #(
+--- a/configure.ac	2025-03-13 13:24:15.532427246 +0000
++++ b/configure.ac	2025-03-13 13:28:32.679151043 +0000
+@@ -283,7 +283,7 @@
+                         ASFLAGS="$ASFLAGS -DPREFIX"
+                     ])
+                 ],
+-                [*linux*|*solaris*|*haiku*|*-gnu*], [
++                [*linux*|*solaris*|*haiku*|*-gnu*|*-nto-qnx*], [
+                     ASFLAGS="$ASFLAGS -f elf$BITTYPE -DSTACK_ALIGNMENT=16"
+                 ],
+                 [ # default
