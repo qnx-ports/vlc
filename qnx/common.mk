@@ -128,6 +128,8 @@ VLC_CFG_ARGS += --host=${VLC_HOST} \
 		--with-contrib=$(CURDIR)/${VLC_HOST} \
 		--prefix=$(CURDIR)/install
 
+VLC_MAKE_ENV := LIBS_qt="-lfreetype -lz -lxml2 -llzma"
+
 # Currently x86_64 does not support audio/ALSA
 ifneq "$(CPU)" "x86_64"
     VLC_CFG_ARGS += --enable-alsa
